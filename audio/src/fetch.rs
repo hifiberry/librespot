@@ -78,7 +78,7 @@ impl AudioFileOpenStreaming {
             seek_rx,
             complete_tx,
         );
-        self.session.spawn(move |_| fetcher);
+        self.session.spawn(fetcher);
 
         AudioFileStreaming {
             read_file: read_file,
@@ -152,7 +152,7 @@ impl AudioFile {
         };
 
         let session_ = session.clone();
-        session.spawn(move |_| {
+        session.spawn(
             complete_rx
                 .map(move |mut file| {
                     if let Some(cache) = session_.cache() {
@@ -162,8 +162,8 @@ impl AudioFile {
                         debug!("File {} complete", file_id);
                     }
                 })
-                .or_else(|oneshot::Canceled| Ok(()))
-        });
+                .or_else(|oneshot::Canceled| Ok(())),
+        );
 
         AudioFileOpen::Streaming(open)
     }
@@ -349,7 +349,7 @@ impl Seek for AudioFileStreaming {
     fn seek(&mut self, pos: SeekFrom) -> io::Result<u64> {
         self.position = self.read_file.seek(pos)?;
         // Do not seek past EOF
-        if (self.position as usize % CHUNK_SIZE) != 0  {
+        if (self.position as usize % CHUNK_SIZE) != 0 {
             // Notify the fetch thread to get the correct block
             // This can fail if fetch thread has completed, in which case the
             // block is ready. Just ignore the error.

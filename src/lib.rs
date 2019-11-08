@@ -7,7 +7,7 @@ extern crate hyper;
 extern crate num_bigint;
 extern crate protobuf;
 extern crate rand;
-extern crate tokio_core;
+extern crate tokio;
 extern crate url;
 
 pub extern crate librespot_audio as audio;
