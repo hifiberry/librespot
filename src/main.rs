@@ -23,7 +23,10 @@ use std::{
     process::exit,
     str::FromStr,
 };
-use tokio::runtime::current_thread;
+use tokio::runtime::{
+    current_thread,
+    current_thread::{Handle, Runtime},
+};
 
 use tokio_io::IoStream;
 use url::Url;
@@ -374,6 +377,7 @@ struct Main {
     device: Option<String>,
     mixer: fn(Option<MixerConfig>) -> Box<dyn Mixer>,
     mixer_config: MixerConfig,
+    handle: Handle,
     discovery: Option<DiscoveryStream>,
     signal: IoStream<()>,
 
@@ -388,8 +392,9 @@ struct Main {
 }
 
 impl Main {
-    fn new(setup: Setup) -> Main {
+    fn new(handle: Handle, setup: Setup) -> Main {
         let mut task = Main {
+            handle: handle,
             cache: setup.cache,
             session_config: setup.session_config,
             player_config: setup.player_config,
@@ -426,8 +431,8 @@ impl Main {
 
     fn credentials(&mut self, credentials: Credentials) {
         let config = self.session_config.clone();
-
-        let connection = Session::connect(config, credentials, self.cache.clone());
+        let handle = self.handle.clone();
+        let connection = Session::connect(config, credentials, self.cache.clone(), handle);
 
         self.connect = connection;
         self.spirc = None;
@@ -535,5 +540,9 @@ fn main() {
 
     let args: Vec<String> = std::env::args().collect();
 
-    current_thread::block_on_all(Main::new(setup(&args))).unwrap()
+    let mut runtime = Runtime::new().unwrap();
+    let handle = runtime.handle();
+    runtime.block_on(Main::new(handle, setup(&args))).unwrap();
+    runtime.run().unwrap();
+    // current_thread::block_on_all(Main::new(setup(&args))).unwrap()
 }
