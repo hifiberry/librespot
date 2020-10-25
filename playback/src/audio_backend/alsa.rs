@@ -6,6 +6,7 @@ use std::env;
 use std::ffi::CString;
 use std::io;
 use std::process::exit;
+use std::process::Command;
 
 pub struct AlsaSink(Option<PCM>, String);
 
