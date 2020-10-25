@@ -27,6 +27,12 @@ fn list_outputs() {
 }
 
 fn open_device(dev_name: &str) -> Result<PCM, Box<Error>> {
+    // Stop other players
+    let output = Command::new("/opt/hifiberry/bin/pause-all").arg("vollibrespot").output().expect("failed to execute process");
+    if !output.status.success() {
+       error!("couldn't stop other players using pause-all");
+    }
+    
     let pcm = PCM::new(dev_name, Direction::Playback, false)?;
     // http://www.linuxjournal.com/article/6735?page=0,1#N0x19ab2890.0x19ba78d8
     // latency = period_size * periods / (rate * bytes_per_frame)
