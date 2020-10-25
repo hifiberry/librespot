@@ -9,6 +9,11 @@ which are not available in the official library.
 
 Note: librespot only works with Spotify Premium
 
+## HiFiBerry fork
+
+This fork is based on the ashthespy/librespot fork that's used in  ashthespy/Vollibrespot. It includes a simple patch that stops other players before starting playback to make
+sure no other process is using the sound card anymore.
+
 ## This fork
 As the origin by [plietar](https://github.com/plietar/) is no longer actively maintained, this organisation and repository have been set up so that the project may be maintained and upgraded in the future.
 
