@@ -32,6 +32,8 @@ fn open_device(dev_name: &str) -> Result<PCM, Box<Error>> {
     let output = Command::new("/opt/hifiberry/bin/pause-all").arg("vollibrespot").output().expect("failed to execute process");
     if !output.status.success() {
        error!("couldn't stop other players using pause-all");
+    } else {
+        info!("stopped other players");
     }
     
     let pcm = PCM::new(dev_name, Direction::Playback, false)?;
